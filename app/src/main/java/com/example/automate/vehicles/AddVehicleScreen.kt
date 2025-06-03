@@ -46,12 +46,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.ui.draw.clip
+import com.example.automate.model.Vehicle
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddVehicleScreen(
-    onSaveClick: () -> Unit,
+    onSaveClick: (Vehicle) -> Unit,
     onCancelClick: () -> Unit
 ) {
     var brand by remember { mutableStateOf(TextFieldValue("")) }
@@ -77,7 +78,8 @@ fun AddVehicleScreen(
         calendar.get(Calendar.DAY_OF_MONTH)
     )
 
-    val enableOptional = brand.text.isNotBlank() || model.text.isNotBlank() || plate.text.isNotBlank()
+    val enableOptional =
+        brand.text.isNotBlank() || model.text.isNotBlank() || plate.text.isNotBlank()
 
 
     Column(
@@ -113,8 +115,12 @@ fun AddVehicleScreen(
 
             Button(
                 onClick = {
-                    // TODO: save vehicle
-                    onSaveClick()
+                    val vehicle = Vehicle(
+                        brand = brand.text,
+                        model = model.text,
+                        plate = plate.text
+                    )
+                    onSaveClick(vehicle)
                 }
             ) {
                 Text("Save")
@@ -265,7 +271,7 @@ fun AddVehicleScreen(
                 onClick = { datePickerDialog.show() },
                 enabled = enableOptional,
 
-            ) {
+                ) {
                 Icon(
                     imageVector = Icons.Filled.DateRange,
                     contentDescription = "Date",
@@ -283,6 +289,5 @@ fun AddVehicleScreen(
                 )
             }
         }
-
     }
 }

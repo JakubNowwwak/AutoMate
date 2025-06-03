@@ -11,9 +11,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Card
@@ -31,9 +31,11 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.automate.model.Vehicle
 
 @Composable
 fun VehiclesScreen(
+    vehicles: List<Vehicle>,
     onAddVehicleClick: () -> Unit = {},
     onVehicleClick: (String) -> Unit = {}
 ) {
@@ -109,21 +111,20 @@ fun VehiclesScreen(
             Spacer(modifier = Modifier.height(4.dp))
 
             LazyColumn {
-                items(5) { index ->
+                items(vehicles) { vehicle ->
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        onClick = { onVehicleClick("vehicleId-$index") }
-
+                            .padding(vertical = 8.dp)
                     ) {
-                        Text(
-                            text = "Vehicle $index",
-                            modifier = Modifier.padding(16.dp)
-                        )
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text(text = "${vehicle.brand} ${vehicle.model}")
+                            Text(text = vehicle.plate)
+                        }
                     }
                 }
             }
+
         }
     }
 }

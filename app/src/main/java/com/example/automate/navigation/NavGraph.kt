@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.automate.vehicles.AddVehicleScreen
 import com.example.automate.vehicles.VehiclesScreen
+import com.example.automate.viewModel.VehicleViewModel
 
 object Routes {
     const val VEHICLES = "vehicles"
@@ -14,20 +15,21 @@ object Routes {
 
 @Composable
 fun NavGraph(navController: NavHostController) {
+    val vehicleViewModel = VehicleViewModel()
+
     NavHost(navController, startDestination = Routes.VEHICLES) {
         composable(Routes.VEHICLES) {
             VehiclesScreen(
+                vehicles = vehicleViewModel.vehicles,
                 onAddVehicleClick = {
                     navController.navigate(Routes.ADD_VEHICLE)
-                },
-                onVehicleClick = { vehicleId ->
-                    //TODO Implement vehicle click
                 }
             )
         }
         composable(Routes.ADD_VEHICLE) {
             AddVehicleScreen(
-                onSaveClick = {
+                onSaveClick = { vehicle ->
+                    vehicleViewModel.addVehicle(vehicle)
                     navController.popBackStack()
                 },
                 onCancelClick = {
