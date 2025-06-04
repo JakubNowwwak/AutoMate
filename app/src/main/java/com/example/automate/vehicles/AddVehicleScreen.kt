@@ -1,7 +1,11 @@
 package com.example.automate.vehicles
 
 import android.app.DatePickerDialog
+import android.net.Uri
 import android.widget.DatePicker
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -46,6 +50,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.ui.draw.clip
+import coil.compose.rememberAsyncImagePainter
 import com.example.automate.model.Vehicle
 
 
@@ -66,6 +71,14 @@ fun AddVehicleScreen(
     val calendar = Calendar.getInstance()
     val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
     var selectedAgeDate by remember { mutableStateOf<String?>(null) }
+
+    var vehicleImage by remember { mutableStateOf<Uri?>(null) }
+
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        vehicleImage = uri
+    }
 
     val datePickerDialog = DatePickerDialog(
         context,
@@ -138,155 +151,154 @@ fun AddVehicleScreen(
                     .size(200.dp)
                     .clip(CircleShape)
                     .background(Color.LightGray)
-                    .clickable { /* TODO: image pick */ },
+                    .clickable { imagePickerLauncher.launch("image/*") },
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    imageVector = Icons.Default.AccountBox,
-                    contentDescription = "Add image",
-                    modifier = Modifier.size(48.dp),
-                    tint = Color.DarkGray
-                )
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = "Add main picture",
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.Gray
-            )
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        OutlinedTextField(
-            value = brand,
-            onValueChange = { brand = it },
-            label = { Text("Brand") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        OutlinedTextField(
-            value = model,
-            onValueChange = { model = it },
-            label = { Text("Model") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        OutlinedTextField(
-            value = plate,
-            onValueChange = { plate = it },
-            label = { Text("License Plate") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        HorizontalDivider(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp),
-            thickness = 2.dp
-        )
-
-        Text(
-            text = "Optional",
-            style = MaterialTheme.typography.labelLarge,
-            modifier = Modifier.padding(bottom = 8.dp),
-            color = Color.Gray
-        )
-
-        Column {
-            OutlinedTextField(
-                value = vin,
-                onValueChange = { vin = it },
-                label = { Text("VIN") },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = enableOptional
-            )
-        }
-
-        val unitOptions = listOf("km", "mi")
-        var selectedUnit by remember { mutableStateOf("km") }
-        var expandedUnit by remember { mutableStateOf(false) }
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            ExposedDropdownMenuBox(
-                expanded = expandedUnit,
-                onExpandedChange = { expandedUnit = !expandedUnit }
-            ) {
-                OutlinedTextField(
-                    value = selectedUnit,
-                    onValueChange = {},
-                    readOnly = true,
-                    enabled = enableOptional,
-                    label = { Text("Unit") },
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedUnit) },
-                    modifier = Modifier
-                        .width(100.dp)
-                        .menuAnchor()
-                )
-
-                ExposedDropdownMenu(
-                    expanded = expandedUnit,
-                    onDismissRequest = { expandedUnit = false }
-                ) {
-                    unitOptions.forEach { unit ->
-                        DropdownMenuItem(
-                            text = { Text(unit) },
-                            onClick = {
-                                selectedUnit = unit
-                                expandedUnit = false
-                            }
-                        )
-                    }
+                if (vehicleImage != null) {
+                    Image(
+                        painter = rememberAsyncImagePainter(vehicleImage),
+                        contentDescription = "Selected image",
+                        modifier = Modifier.fillMaxSize()
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.Default.AccountBox,
+                        contentDescription = "Add image",
+                        modifier = Modifier.size(48.dp),
+                        tint = Color.DarkGray
+                    )
                 }
             }
 
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedTextField(
-                value = milage,
-                onValueChange = { milage = it },
-                label = { Text("Mileage") },
-                enabled = enableOptional,
-                modifier = Modifier.weight(1f)
+                value = brand,
+                onValueChange = { brand = it },
+                label = { Text("Brand") },
+                modifier = Modifier.fillMaxWidth()
             )
-        }
 
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp)
-        ) {
-            Button(
-                onClick = { datePickerDialog.show() },
-                enabled = enableOptional,
+            Spacer(modifier = Modifier.height(8.dp))
 
-                ) {
-                Icon(
-                    imageVector = Icons.Filled.DateRange,
-                    contentDescription = "Date",
-                    modifier = Modifier.padding(end = 8.dp)
+            OutlinedTextField(
+                value = model,
+                onValueChange = { model = it },
+                label = { Text("Model") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = plate,
+                onValueChange = { plate = it },
+                label = { Text("License Plate") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            HorizontalDivider(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp),
+                thickness = 2.dp
+            )
+
+            Text(
+                text = "Optional",
+                style = MaterialTheme.typography.labelLarge,
+                modifier = Modifier.padding(bottom = 8.dp),
+                color = Color.Gray
+            )
+
+            Column {
+                OutlinedTextField(
+                    value = vin,
+                    onValueChange = { vin = it },
+                    label = { Text("VIN") },
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = enableOptional
                 )
-                Text("Add vehicle age")
             }
 
+            val unitOptions = listOf("km", "mi")
+            var selectedUnit by remember { mutableStateOf("km") }
+            var expandedUnit by remember { mutableStateOf(false) }
 
-            if (selectedAgeDate != null) {
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "Selected date: $selectedAgeDate",
-                    style = MaterialTheme.typography.bodyMedium
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                ExposedDropdownMenuBox(
+                    expanded = expandedUnit,
+                    onExpandedChange = { expandedUnit = !expandedUnit }
+                ) {
+                    OutlinedTextField(
+                        value = selectedUnit,
+                        onValueChange = {},
+                        readOnly = true,
+                        enabled = enableOptional,
+                        label = { Text("Unit") },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedUnit) },
+                        modifier = Modifier
+                            .width(100.dp)
+                    )
+
+                    ExposedDropdownMenu(
+                        expanded = expandedUnit,
+                        onDismissRequest = { expandedUnit = false }
+                    ) {
+                        unitOptions.forEach { unit ->
+                            DropdownMenuItem(
+                                text = { Text(unit) },
+                                onClick = {
+                                    selectedUnit = unit
+                                    expandedUnit = false
+                                }
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                OutlinedTextField(
+                    value = milage,
+                    onValueChange = { milage = it },
+                    label = { Text("Mileage") },
+                    enabled = enableOptional,
+                    modifier = Modifier.weight(1f)
                 )
+            }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp)
+            ) {
+                Button(
+                    onClick = { datePickerDialog.show() },
+                    enabled = enableOptional,
+
+                    ) {
+                    Icon(
+                        imageVector = Icons.Filled.DateRange,
+                        contentDescription = "Date",
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
+                    Text("Add vehicle age")
+                }
+
+
+                if (selectedAgeDate != null) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "Selected date: $selectedAgeDate",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
             }
         }
     }
