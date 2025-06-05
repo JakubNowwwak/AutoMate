@@ -131,7 +131,8 @@ fun AddVehicleScreen(
                     val vehicle = Vehicle(
                         brand = brand.text,
                         model = model.text,
-                        plate = plate.text
+                        plate = plate.text,
+                        image = vehicleImage?.toString()
                     )
                     onSaveClick(vehicle)
                 }

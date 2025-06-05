@@ -1,5 +1,7 @@
 package com.example.automate.vehicles
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,11 +29,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import coil.compose.rememberAsyncImagePainter
 import com.example.automate.model.Vehicle
+
 
 @Composable
 fun VehiclesScreen(
@@ -115,16 +122,58 @@ fun VehiclesScreen(
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 8.dp)
+                            .padding(vertical = 8.dp),
+                        onClick = { onVehicleClick(vehicle.id) }
                     ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Text(text = "${vehicle.brand} ${vehicle.model}")
-                            Text(text = vehicle.plate)
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp)
+                        )
+                        {
+                            if (!vehicle.image.isNullOrBlank()) {
+                                Image(
+                                    painter = rememberAsyncImagePainter(vehicle.image),
+                                    contentDescription = "Vehicle image",
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier.fillMaxSize()
+                                )
+                            }
+
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(
+                                        brush = Brush.verticalGradient(
+                                            colors = listOf(
+                                                Color.Transparent,
+                                                Color.Black.copy(alpha = 0.7f)
+                                            ),
+                                            startY = 100f
+                                        )
+                                    )
+                            )
+
+                            Column(
+                                modifier = Modifier
+                                    .align(Alignment.BottomStart)
+                                    .padding(16.dp)
+                            ) {
+                                Text(
+                                    text = vehicle.plate,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = Color.White
+                                )
+                                Text(
+                                    text = "${vehicle.brand} ${vehicle.model}",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = Color.White
+                                )
+                            }
                         }
                     }
                 }
             }
-
         }
     }
 }
