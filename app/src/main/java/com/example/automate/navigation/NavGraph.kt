@@ -1,6 +1,8 @@
 package com.example.automate.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -16,13 +18,16 @@ object Routes {
 }
 
 @Composable
-fun NavGraph(navController: NavHostController) {
-    val vehicleViewModel = VehicleViewModel()
+fun NavGraph(
+    navController: NavHostController,
+    vehicleViewModel: VehicleViewModel
+) {
 
     NavHost(navController, startDestination = Routes.VEHICLES) {
         composable(Routes.VEHICLES) {
+            val vehicleList by vehicleViewModel.vehicles.collectAsState()
             VehiclesScreen(
-                vehicles = vehicleViewModel.vehicles,
+                vehicles = vehicleList,
                 onAddVehicleClick = {
                     navController.navigate(Routes.ADD_VEHICLE)
                 },

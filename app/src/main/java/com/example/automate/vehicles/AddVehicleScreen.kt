@@ -1,7 +1,12 @@
 package com.example.automate.vehicles
 
 import android.app.DatePickerDialog
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
 import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
 import android.widget.DatePicker
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -55,6 +60,9 @@ import androidx.compose.ui.res.stringResource
 import coil.compose.rememberAsyncImagePainter
 import com.example.automate.R
 import com.example.automate.model.Vehicle
+import java.io.File
+import java.io.FileOutputStream
+import java.util.UUID
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -129,14 +137,36 @@ fun AddVehicleScreen(
                 )
             }
 
+            val context = LocalContext.current
+            val unitOptions = listOf(stringResource(R.string.km), stringResource(R.string.mi))
+            var selectedUnit by remember { mutableStateOf("km") }
+
             Button(
                 onClick = {
+                    val imagePath = vehicleImage?.let { uri ->
+                        val bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                            val source = ImageDecoder.createSource(context.contentResolver, uri)
+                            ImageDecoder.decodeBitmap(source)
+                        } else {
+                            @Suppress("DEPRECATION")
+                            MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
+                        }
+
+                        saveImageToInternalStorage(context, bitmap, "${UUID.randomUUID()}.jpg")
+                    }
+
+
                     val vehicle = Vehicle(
                         brand = brand.text,
                         model = model.text,
                         plate = plate.text,
-                        image = vehicleImage?.toString()
+                        vin = vin.text,
+                        mileage = milage.text,
+                        unit = selectedUnit,
+                        registrationDate = selectedAgeDate,
+                        image = imagePath
                     )
+
                     onSaveClick(vehicle)
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
@@ -309,3 +339,12 @@ fun AddVehicleScreen(
         }
     }
 }
+
+fun saveImageToInternalStorage(context: Context, bitmap: Bitmap, filename: String): String {
+    val file = File(context.filesDir, filename)
+    FileOutputStream(file).use { out ->
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
+    }
+    return file.absolutePath
+}
+
