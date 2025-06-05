@@ -1,3 +1,31 @@
 <resources>
     <string name="app_name">AUTOmate</string>
+    <string name="add_vehicle">Add Vehicle</string>
+    <string name="select_your_vehicle">Select your vehicle</string>
+    <string name="hamburger_menu">Hamburger menu</string>
+    <string name="vehicle_image">Vehicle image</string>
+    <string name="cancel">Cancel</string>
+    <string name="create_vehicle">Create vehicle</string>
+    <string name="save">Save</string>
+    <string name="selected_image">Selected image</string>
+    <string name="add_image">Add image</string>
+    <string name="brand">Brand</string>
+    <string name="model">Model</string>
+    <string name="license_plate">License Plate</string>
+    <string name="optional">Optional</string>
+    <string name="vin">VIN</string>
+    <string name="km">km</string>
+    <string name="mi">mi</string>
+    <string name="unit">Unit</string>
+    <string name="mileage">Mileage</string>
+    <string name="date">Date</string>
+    <string name="add_vehicle_age">Add vehicle age</string>
+    <string name="selected_date">Selected date: %1$s</string>
+    <string name="back">Back</string>
+    <string name="vehicle_overview">Vehicle Overview</string>
+    <string name="show_information">Show Information</string>
+    <string name="modify_information">Modify Information</string>
+    <string name="fuel_overview">Fuel Overview</string>
+    <string name="maintenance">Maintenance</string>
+    <string name="remove_vehicle">Remove Vehicle</string>
 </resources>

@@ -32,11 +32,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
+import com.example.automate.R
 import com.example.automate.model.Vehicle
 
 
@@ -49,9 +51,11 @@ fun VehiclesScreen(
     Scaffold(
         floatingActionButton = {
             ExtendedFloatingActionButton(
-                text = { Text("Add Vehicle") },
+                text = { Text(stringResource(R.string.add_vehicle)) },
                 icon = { Icon(Icons.Filled.Create, contentDescription = null) },
-                onClick = onAddVehicleClick
+                onClick = onAddVehicleClick,
+                containerColor = Color.LightGray,
+                contentColor = Color.Black
             )
         }
     ) { padding ->
@@ -72,7 +76,7 @@ fun VehiclesScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Menu,
-                        contentDescription = "Menu"
+                        contentDescription = stringResource(R.string.hamburger_menu)
                     )
                 }
 
@@ -102,7 +106,7 @@ fun VehiclesScreen(
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = "Select your vehicle",
+                    text = stringResource(R.string.select_your_vehicle),
                     style = MaterialTheme.typography.headlineMedium
                 )
                 Spacer(modifier = Modifier.width(8.dp))
@@ -123,7 +127,8 @@ fun VehiclesScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 8.dp),
-                        onClick = { onVehicleClick(vehicle.id) }
+                        onClick = {onVehicleClick(vehicle.id)}
+
                     ) {
                         Box(
                             modifier = Modifier
@@ -134,7 +139,7 @@ fun VehiclesScreen(
                             if (!vehicle.image.isNullOrBlank()) {
                                 Image(
                                     painter = rememberAsyncImagePainter(vehicle.image),
-                                    contentDescription = "Vehicle image",
+                                    contentDescription = stringResource(R.string.vehicle_image),
                                     contentScale = ContentScale.Crop,
                                     modifier = Modifier.fillMaxSize()
                                 )

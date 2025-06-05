@@ -9,4 +9,8 @@ class VehicleViewModel {
     fun addVehicle(vehicle: Vehicle) {
         _vehicles.add(vehicle)
     }
+
+    fun getVehicleById(id: String): Vehicle? {
+        return _vehicles.find { it.id == id }
+    }
 }

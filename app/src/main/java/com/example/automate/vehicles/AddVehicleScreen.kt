@@ -49,8 +49,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.filled.AccountBox
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import coil.compose.rememberAsyncImagePainter
+import com.example.automate.R
 import com.example.automate.model.Vehicle
 
 
@@ -114,14 +117,14 @@ fun AddVehicleScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Close,
-                        contentDescription = "Cancel"
+                        contentDescription = stringResource(R.string.cancel)
                     )
                 }
 
                 Spacer(modifier = Modifier.width(8.dp))
 
                 Text(
-                    text = "Create vehicle",
+                    text = stringResource(R.string.create_vehicle),
                     style = MaterialTheme.typography.headlineMedium,
                 )
             }
@@ -135,9 +138,10 @@ fun AddVehicleScreen(
                         image = vehicleImage?.toString()
                     )
                     onSaveClick(vehicle)
-                }
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
             ) {
-                Text("Save")
+                Text(stringResource(R.string.save))
             }
         }
 
@@ -158,13 +162,13 @@ fun AddVehicleScreen(
                 if (vehicleImage != null) {
                     Image(
                         painter = rememberAsyncImagePainter(vehicleImage),
-                        contentDescription = "Selected image",
+                        contentDescription = stringResource(R.string.selected_image),
                         modifier = Modifier.fillMaxSize()
                     )
                 } else {
                     Icon(
                         imageVector = Icons.Default.AccountBox,
-                        contentDescription = "Add image",
+                        contentDescription = stringResource(R.string.add_image),
                         modifier = Modifier.size(48.dp),
                         tint = Color.DarkGray
                     )
@@ -176,7 +180,7 @@ fun AddVehicleScreen(
             OutlinedTextField(
                 value = brand,
                 onValueChange = { brand = it },
-                label = { Text("Brand") },
+                label = { Text(stringResource(R.string.brand)) },
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -185,7 +189,7 @@ fun AddVehicleScreen(
             OutlinedTextField(
                 value = model,
                 onValueChange = { model = it },
-                label = { Text("Model") },
+                label = { Text(stringResource(R.string.model)) },
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -194,7 +198,7 @@ fun AddVehicleScreen(
             OutlinedTextField(
                 value = plate,
                 onValueChange = { plate = it },
-                label = { Text("License Plate") },
+                label = { Text(stringResource(R.string.license_plate)) },
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -206,7 +210,7 @@ fun AddVehicleScreen(
             )
 
             Text(
-                text = "Optional",
+                text = stringResource(R.string.optional),
                 style = MaterialTheme.typography.labelLarge,
                 modifier = Modifier.padding(bottom = 8.dp),
                 color = Color.Gray
@@ -216,13 +220,13 @@ fun AddVehicleScreen(
                 OutlinedTextField(
                     value = vin,
                     onValueChange = { vin = it },
-                    label = { Text("VIN") },
+                    label = { Text(stringResource(R.string.vin)) },
                     modifier = Modifier.fillMaxWidth(),
                     enabled = enableOptional
                 )
             }
 
-            val unitOptions = listOf("km", "mi")
+            val unitOptions = listOf(stringResource(R.string.km), stringResource(R.string.mi))
             var selectedUnit by remember { mutableStateOf("km") }
             var expandedUnit by remember { mutableStateOf(false) }
 
@@ -241,10 +245,11 @@ fun AddVehicleScreen(
                         onValueChange = {},
                         readOnly = true,
                         enabled = enableOptional,
-                        label = { Text("Unit") },
+                        label = { Text(stringResource(R.string.unit)) },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedUnit) },
                         modifier = Modifier
                             .width(100.dp)
+                            .menuAnchor()
                     )
 
                     ExposedDropdownMenu(
@@ -268,7 +273,7 @@ fun AddVehicleScreen(
                 OutlinedTextField(
                     value = milage,
                     onValueChange = { milage = it },
-                    label = { Text("Mileage") },
+                    label = { Text(stringResource(R.string.mileage)) },
                     enabled = enableOptional,
                     modifier = Modifier.weight(1f)
                 )
@@ -286,17 +291,17 @@ fun AddVehicleScreen(
                     ) {
                     Icon(
                         imageVector = Icons.Filled.DateRange,
-                        contentDescription = "Date",
+                        contentDescription = stringResource(R.string.date),
                         modifier = Modifier.padding(end = 8.dp)
                     )
-                    Text("Add vehicle age")
+                    Text(stringResource(R.string.add_vehicle_age))
                 }
 
 
                 if (selectedAgeDate != null) {
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Selected date: $selectedAgeDate",
+                        text = stringResource(R.string.selected_date, selectedAgeDate!!),
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
