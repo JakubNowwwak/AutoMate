@@ -15,4 +15,3 @@ data class Vehicle(
     var registrationDate: String? = null,
     var image: String? = null
 )
-

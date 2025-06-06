@@ -1,8 +1,6 @@
 package com.example.automate.vehicles
 
 import android.app.DatePickerDialog
-import android.content.Context
-import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
@@ -13,77 +11,56 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.stringResource
 import coil.compose.rememberAsyncImagePainter
 import com.example.automate.R
 import com.example.automate.model.Vehicle
 import java.io.File
 import java.io.FileOutputStream
-import java.util.UUID
-
+import java.text.SimpleDateFormat
+import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddVehicleScreen(
+fun ModifyVehicleScreen(
+    vehicleToEdit: Vehicle,
     onSaveClick: (Vehicle) -> Unit,
     onCancelClick: () -> Unit
 ) {
-    var brand by remember { mutableStateOf(TextFieldValue("")) }
-    var model by remember { mutableStateOf(TextFieldValue("")) }
-    var plate by remember { mutableStateOf(TextFieldValue("")) }
+    val textFieldValueSaver = listSaver<TextFieldValue, Any>(
+        save = { listOf(it.text) },
+        restore = { TextFieldValue(it[0] as String) }
+    )
 
-    var vin by remember { mutableStateOf(TextFieldValue("")) }
-    var milage by remember { mutableStateOf(TextFieldValue("")) }
+    var brand by rememberSaveable(stateSaver = textFieldValueSaver) { mutableStateOf(TextFieldValue(vehicleToEdit.brand)) }
+    var model by rememberSaveable(stateSaver = textFieldValueSaver) { mutableStateOf(TextFieldValue(vehicleToEdit.model)) }
+    var plate by rememberSaveable(stateSaver = textFieldValueSaver) { mutableStateOf(TextFieldValue(vehicleToEdit.plate)) }
+    var vin by rememberSaveable(stateSaver = textFieldValueSaver) { mutableStateOf(TextFieldValue(vehicleToEdit.vin ?: "")) }
+    var milage by rememberSaveable(stateSaver = textFieldValueSaver) { mutableStateOf(TextFieldValue(vehicleToEdit.mileage ?: "")) }
+    var selectedUnit by rememberSaveable { mutableStateOf(vehicleToEdit.unit ?: "km") }
+    var selectedAgeDate by rememberSaveable { mutableStateOf(vehicleToEdit.registrationDate) }
+    var vehicleImage by rememberSaveable { mutableStateOf(vehicleToEdit.image?.let { Uri.parse(it) }) }
 
     val context = LocalContext.current
     val calendar = Calendar.getInstance()
     val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
-    var selectedAgeDate by remember { mutableStateOf<String?>(null) }
-
-    var vehicleImage by remember { mutableStateOf<Uri?>(null) }
 
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -105,13 +82,11 @@ fun AddVehicleScreen(
     val enableOptional =
         brand.text.isNotBlank() || model.text.isNotBlank() || plate.text.isNotBlank()
 
-
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -120,43 +95,35 @@ fun AddVehicleScreen(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                IconButton(
-                    onClick = { onCancelClick() },
-                ) {
+                IconButton(onClick = onCancelClick) {
                     Icon(
                         imageVector = Icons.Filled.Close,
                         contentDescription = stringResource(R.string.cancel)
                     )
                 }
-
                 Spacer(modifier = Modifier.width(8.dp))
-
                 Text(
-                    text = stringResource(R.string.create_vehicle),
-                    style = MaterialTheme.typography.headlineMedium,
+                    text = "Edit Vehicle",
+                    style = MaterialTheme.typography.headlineMedium
                 )
             }
-
-            val context = LocalContext.current
-            val unitOptions = listOf(stringResource(R.string.km), stringResource(R.string.mi))
-            var selectedUnit by remember { mutableStateOf("km") }
-
             Button(
                 onClick = {
-                    val imagePath = vehicleImage?.let { uri ->
+                    val imagePath = if (vehicleImage != null && vehicleImage.toString().startsWith("content://")) {
                         val bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                            val source = ImageDecoder.createSource(context.contentResolver, uri)
+                            val source = ImageDecoder.createSource(context.contentResolver, vehicleImage!!)
                             ImageDecoder.decodeBitmap(source)
                         } else {
                             @Suppress("DEPRECATION")
-                            MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
+                            MediaStore.Images.Media.getBitmap(context.contentResolver, vehicleImage!!)
                         }
-
                         saveImageToInternalStorage(context, bitmap, "${UUID.randomUUID()}.jpg")
+                    } else {
+                        vehicleToEdit.image
                     }
 
-
-                    val vehicle = Vehicle(
+                    val updatedVehicle = Vehicle(
+                        id = vehicleToEdit.id,
                         brand = brand.text,
                         model = model.text,
                         plate = plate.text,
@@ -166,8 +133,7 @@ fun AddVehicleScreen(
                         registrationDate = selectedAgeDate,
                         image = imagePath
                     )
-
-                    onSaveClick(vehicle)
+                    onSaveClick(updatedVehicle)
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
             ) {
@@ -246,18 +212,15 @@ fun AddVehicleScreen(
                 color = Color.Gray
             )
 
-            Column {
-                OutlinedTextField(
-                    value = vin,
-                    onValueChange = { vin = it },
-                    label = { Text(stringResource(R.string.vin)) },
-                    modifier = Modifier.fillMaxWidth(),
-                    enabled = enableOptional
-                )
-            }
+            OutlinedTextField(
+                value = vin,
+                onValueChange = { vin = it },
+                label = { Text(stringResource(R.string.vin)) },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = enableOptional
+            )
 
             val unitOptions = listOf(stringResource(R.string.km), stringResource(R.string.mi))
-            var selectedUnit by remember { mutableStateOf("km") }
             var expandedUnit by remember { mutableStateOf(false) }
 
             Row(
@@ -277,9 +240,7 @@ fun AddVehicleScreen(
                         enabled = enableOptional,
                         label = { Text(stringResource(R.string.unit)) },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedUnit) },
-                        modifier = Modifier
-                            .width(100.dp)
-                            .menuAnchor()
+                        modifier = Modifier.width(100.dp).menuAnchor()
                     )
 
                     ExposedDropdownMenu(
@@ -309,41 +270,26 @@ fun AddVehicleScreen(
                 )
             }
 
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp)
+            Button(
+                onClick = { datePickerDialog.show() },
+                enabled = enableOptional
             ) {
-                Button(
-                    onClick = { datePickerDialog.show() },
-                    enabled = enableOptional,
+                Icon(
+                    imageVector = Icons.Filled.DateRange,
+                    contentDescription = stringResource(R.string.date),
+                    modifier = Modifier.padding(end = 8.dp)
+                )
+                Text(stringResource(R.string.add_vehicle_age))
+            }
 
-                    ) {
-                    Icon(
-                        imageVector = Icons.Filled.DateRange,
-                        contentDescription = stringResource(R.string.date),
-                        modifier = Modifier.padding(end = 8.dp)
-                    )
-                    Text(stringResource(R.string.add_vehicle_age))
-                }
-
-
-                if (selectedAgeDate != null) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = stringResource(R.string.selected_date, selectedAgeDate!!),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
+            if (selectedAgeDate != null) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = stringResource(R.string.selected_date, selectedAgeDate!!),
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
         }
     }
 }
 
-fun saveImageToInternalStorage(context: Context, bitmap: Bitmap, filename: String): String {
-    val file = File(context.filesDir, filename)
-    FileOutputStream(file).use { out ->
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
-    }
-    return file.absolutePath
-}

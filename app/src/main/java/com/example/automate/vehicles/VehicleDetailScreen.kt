@@ -27,14 +27,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.automate.R
 import com.example.automate.model.Vehicle
+import com.example.automate.navigation.Routes
 
 @Composable
 fun VehicleDetailScreen(
     vehicle: Vehicle,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    navController: NavController
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
 
@@ -104,8 +107,8 @@ fun VehicleDetailScreen(
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 16.dp)
         ) {
-                        Button(
-                onClick = { /*TODO*/ },
+            Button(
+                onClick = { navController.navigate("${Routes.MODIFY_VEHICLE}/${vehicle.id}")},
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 4.dp),

@@ -31,4 +31,14 @@ class VehicleViewModel(application: Application) : AndroidViewModel(application)
     fun getVehicleById(id: String): Vehicle? {
         return _vehicles.value.find { it.id == id }
     }
+
+    fun updateVehicle(updatedVehicle: Vehicle) {
+        val current = _vehicles.value.toMutableList()
+        val index = current.indexOfFirst { it.id == updatedVehicle.id }
+        if (index != -1) {
+            current[index] = updatedVehicle
+            _vehicles.value = current
+            VehicleStorage.saveVehicles(getApplication(), current)
+        }
+    }
 }

@@ -4,9 +4,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.example.automate.vehicles.AddVehicleScreen
+import com.example.automate.vehicles.ModifyVehicleScreen
 import com.example.automate.vehicles.VehicleDetailScreen
 import com.example.automate.vehicles.VehiclesScreen
 import com.example.automate.viewModel.VehicleViewModel
@@ -15,6 +18,7 @@ object Routes {
     const val VEHICLES = "vehicles"
     const val ADD_VEHICLE = "add_vehicle"
     const val VEHICLE_DETAIL = "vehicle_detail"
+    const val MODIFY_VEHICLE = "modify_vehicle"
 }
 
 @Composable
@@ -55,7 +59,27 @@ fun NavGraph(
             if (vehicle != null) {
                 VehicleDetailScreen(
                     vehicle = vehicle,
-                    onBackClick = { navController.popBackStack() }
+                    onBackClick = { navController.popBackStack() },
+                    navController = navController
+                )
+            }
+        }
+
+        composable(
+            route = "modify_vehicle/{vehicleId}",
+            arguments = listOf(navArgument("vehicleId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val vehicleId = backStackEntry.arguments?.getString("vehicleId")
+            val vehicle = vehicleViewModel.getVehicleById(vehicleId.orEmpty())
+
+            if (vehicle != null) {
+                ModifyVehicleScreen(
+                    vehicleToEdit = vehicle,
+                    onSaveClick = { updatedVehicle ->
+                        vehicleViewModel.updateVehicle(updatedVehicle)
+                        navController.popBackStack()
+                    },
+                    onCancelClick = { navController.popBackStack() }
                 )
             }
         }
