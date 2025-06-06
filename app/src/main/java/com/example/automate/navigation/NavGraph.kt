@@ -8,6 +8,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.automate.fuel.FuelOverviewScreen
 import com.example.automate.vehicles.AddVehicleScreen
 import com.example.automate.vehicles.ModifyVehicleScreen
 import com.example.automate.vehicles.VehicleDetailScreen
@@ -60,8 +61,16 @@ fun NavGraph(
                 VehicleDetailScreen(
                     vehicle = vehicle,
                     onBackClick = { navController.popBackStack() },
+                    onEditClick = {
+                        navController.navigate("modify_vehicle/${vehicle.id}")
+                    },
+                    onDeleteClick = {
+                        vehicleViewModel.removeVehicle(vehicle.id)
+                        navController.popBackStack()
+                    },
                     navController = navController
                 )
+
             }
         }
 
@@ -83,5 +92,16 @@ fun NavGraph(
                 )
             }
         }
+
+        composable("fuel_overview/{vehicleId}", arguments = listOf(
+            navArgument("vehicleId") { type = NavType.StringType }
+        )) { backStackEntry ->
+            val vehicleId = backStackEntry.arguments?.getString("vehicleId") ?: return@composable
+            FuelOverviewScreen(
+                vehicleId = vehicleId,
+                onBackClick = { navController.popBackStack() }
+            )
+        }
+
     }
 }

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -20,6 +21,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -37,6 +42,8 @@ import com.example.automate.navigation.Routes
 fun VehicleDetailScreen(
     vehicle: Vehicle,
     onBackClick: () -> Unit,
+    onEditClick: () -> Unit,
+    onDeleteClick: (Vehicle) -> Unit,
     navController: NavController
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
@@ -118,7 +125,9 @@ fun VehicleDetailScreen(
             }
 
             Button(
-                onClick = { /*TODO*/ },
+                onClick = {
+                    navController.navigate("fuel_overview/${vehicle.id}")
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 4.dp),
@@ -126,6 +135,7 @@ fun VehicleDetailScreen(
             ) {
                 Text(stringResource(R.string.fuel_overview))
             }
+
 
             Button(
                 onClick = { /*TODO*/ },
@@ -137,11 +147,12 @@ fun VehicleDetailScreen(
                 Text(stringResource(R.string.maintenance))
             }
 
+            var showDialog by remember { mutableStateOf(false) }
             Box(
                 modifier = Modifier.fillMaxSize()
             ) {
                 Button(
-                    onClick = { /*TODO*/ },
+                    onClick = { showDialog = true},
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .fillMaxWidth()
@@ -150,6 +161,31 @@ fun VehicleDetailScreen(
                 ) {
                     Text(stringResource(R.string.remove_vehicle))
                 }
+            }
+
+            if (showDialog) {
+                AlertDialog(
+                    onDismissRequest = { showDialog = false },
+                    title = { Text("Confirmation") },
+                    text = { Text("Are you sure you want to delete the vehicle?") },
+                    confirmButton = {
+                        Button(
+                            onClick = {
+                                onDeleteClick(vehicle)
+                                showDialog = false
+                            }
+                        ) {
+                            Text("Yes")
+                        }
+                    },
+                    dismissButton = {
+                        Button(
+                            onClick = { showDialog = false }
+                        ) {
+                            Text("Cancel")
+                        }
+                    }
+                )
             }
         }
     }

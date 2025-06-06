@@ -3,6 +3,7 @@ package com.example.automate.viewModel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.example.automate.data.VehicleStorage
+import com.example.automate.fuel.FuelStorage
 import com.example.automate.model.Vehicle
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,10 +23,12 @@ class VehicleViewModel(application: Application) : AndroidViewModel(application)
         VehicleStorage.saveVehicles(getApplication(), updated)
     }
 
-    fun removeVehicle(id: String) {
-        val updated = _vehicles.value.filterNot { it.id == id }
+    fun removeVehicle(vehicleId: String) {
+        val updated = _vehicles.value.filter { it.id != vehicleId }
         _vehicles.value = updated
         VehicleStorage.saveVehicles(getApplication(), updated)
+
+        FuelStorage.deleteFuelEntries(getApplication(), vehicleId)
     }
 
     fun getVehicleById(id: String): Vehicle? {
