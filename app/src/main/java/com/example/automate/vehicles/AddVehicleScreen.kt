@@ -161,7 +161,7 @@ fun AddVehicleScreen(
                         model = model.text,
                         plate = plate.text,
                         vin = vin.text,
-                        mileage = milage.text,
+                        currentOdometer = milage.text,
                         unit = selectedUnit,
                         registrationDate = selectedAgeDate,
                         image = imagePath

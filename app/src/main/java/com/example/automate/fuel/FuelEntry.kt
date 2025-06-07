@@ -9,6 +9,7 @@ data class FuelEntry(
     val date: String,
     val liters: String,
     val price: String,
+    val odometer: String? = null,
     val note: String? = null
 )
 

@@ -10,7 +10,7 @@ data class Vehicle(
     var model: String,
     var plate: String,
     var vin: String? = null,
-    var mileage: String? = null,
+    var currentOdometer: String? = "0",
     var unit: String? = null,
     var registrationDate: String? = null,
     var image: String? = null

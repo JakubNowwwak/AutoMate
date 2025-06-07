@@ -28,4 +28,16 @@
     <string name="fuel_overview">Fuel Overview</string>
     <string name="maintenance">Maintenance</string>
     <string name="remove_vehicle">Remove Vehicle</string>
+    <string name="fuel_pump_icon">Fuel Pump Icon</string>
+    <string name="money_icon">Money icon</string>
+    <string name="fuel_price_icon">Fuel price icon</string>
+    <string name="fuel_drop_icon">Fuel drop icon</string>
+    <string name="add_fuel_entry">Add Fuel Entry</string>
+    <string name="ok">OK</string>
+    <string name="invalid_odometer">Invalid odometer</string>
+    <string name="new_odometer_value_must_be_greater_than_the_previous_one">New odometer value must be greater than the previous one.</string>
+    <string name="odometer_km">Odometer (km)</string>
+    <string name="total_price">Total Price (€)</string>
+    <string name="liters">Liters</string>
+    <string name="note_optional">Note (optional)</string>
 </resources>

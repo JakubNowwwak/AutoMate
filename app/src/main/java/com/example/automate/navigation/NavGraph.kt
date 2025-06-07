@@ -1,5 +1,7 @@
 package com.example.automate.navigation
 
+import AddFuelScreen
+import FuelOverviewScreen
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -8,7 +10,6 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.automate.fuel.FuelOverviewScreen
 import com.example.automate.vehicles.AddVehicleScreen
 import com.example.automate.vehicles.ModifyVehicleScreen
 import com.example.automate.vehicles.VehicleDetailScreen
@@ -99,9 +100,25 @@ fun NavGraph(
             val vehicleId = backStackEntry.arguments?.getString("vehicleId") ?: return@composable
             FuelOverviewScreen(
                 vehicleId = vehicleId,
-                onBackClick = { navController.popBackStack() }
+                onBackClick = { navController.popBackStack() },
+                onAddClick = {
+                    navController.navigate("add_fuel/$vehicleId")
+                },
+                onEditClick = {
+                    navController.navigate("modify_fuel_entry/${it.id}")
+                }
             )
         }
 
+        composable("add_fuel/{vehicleId}", arguments = listOf(
+            navArgument("vehicleId") { type = NavType.StringType }
+        )) { backStackEntry ->
+            val vehicleId = backStackEntry.arguments?.getString("vehicleId") ?: return@composable
+            AddFuelScreen(
+                vehicleId = vehicleId,
+                onSave = { navController.popBackStack() },
+                onCancel = { navController.popBackStack() }
+            )
+        }
     }
 }

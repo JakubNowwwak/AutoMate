@@ -53,7 +53,7 @@ fun ModifyVehicleScreen(
     var model by rememberSaveable(stateSaver = textFieldValueSaver) { mutableStateOf(TextFieldValue(vehicleToEdit.model)) }
     var plate by rememberSaveable(stateSaver = textFieldValueSaver) { mutableStateOf(TextFieldValue(vehicleToEdit.plate)) }
     var vin by rememberSaveable(stateSaver = textFieldValueSaver) { mutableStateOf(TextFieldValue(vehicleToEdit.vin ?: "")) }
-    var milage by rememberSaveable(stateSaver = textFieldValueSaver) { mutableStateOf(TextFieldValue(vehicleToEdit.mileage ?: "")) }
+    var currentOdometer by rememberSaveable(stateSaver = textFieldValueSaver) { mutableStateOf(TextFieldValue(vehicleToEdit.currentOdometer ?: "")) }
     var selectedUnit by rememberSaveable { mutableStateOf(vehicleToEdit.unit ?: "km") }
     var selectedAgeDate by rememberSaveable { mutableStateOf(vehicleToEdit.registrationDate) }
     var vehicleImage by rememberSaveable { mutableStateOf(vehicleToEdit.image?.let { Uri.parse(it) }) }
@@ -128,7 +128,7 @@ fun ModifyVehicleScreen(
                         model = model.text,
                         plate = plate.text,
                         vin = vin.text,
-                        mileage = milage.text,
+                        currentOdometer = currentOdometer.text,
                         unit = selectedUnit,
                         registrationDate = selectedAgeDate,
                         image = imagePath
@@ -262,8 +262,8 @@ fun ModifyVehicleScreen(
                 Spacer(modifier = Modifier.width(8.dp))
 
                 OutlinedTextField(
-                    value = milage,
-                    onValueChange = { milage = it },
+                    value = currentOdometer,
+                    onValueChange = { currentOdometer = it },
                     label = { Text(stringResource(R.string.mileage)) },
                     enabled = enableOptional,
                     modifier = Modifier.weight(1f)
@@ -292,4 +292,3 @@ fun ModifyVehicleScreen(
         }
     }
 }
-
