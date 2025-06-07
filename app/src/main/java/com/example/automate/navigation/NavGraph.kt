@@ -10,6 +10,8 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.automate.fuel.ModifyFuelScreen
+import com.example.automate.navigation.Routes.MODIFY_FUEL_SCREEN
 import com.example.automate.vehicles.AddVehicleScreen
 import com.example.automate.vehicles.ModifyVehicleScreen
 import com.example.automate.vehicles.VehicleDetailScreen
@@ -21,6 +23,7 @@ object Routes {
     const val ADD_VEHICLE = "add_vehicle"
     const val VEHICLE_DETAIL = "vehicle_detail"
     const val MODIFY_VEHICLE = "modify_vehicle"
+    const val MODIFY_FUEL_SCREEN = "modify_fuel"
 }
 
 @Composable
@@ -94,31 +97,42 @@ fun NavGraph(
             }
         }
 
-        composable("fuel_overview/{vehicleId}", arguments = listOf(
-            navArgument("vehicleId") { type = NavType.StringType }
-        )) { backStackEntry ->
-            val vehicleId = backStackEntry.arguments?.getString("vehicleId") ?: return@composable
+        composable("fuel_overview/{vehicleId}") { backStackEntry ->
+            val vehicleId = backStackEntry.arguments?.getString("vehicleId") ?: ""
             FuelOverviewScreen(
                 vehicleId = vehicleId,
                 onBackClick = { navController.popBackStack() },
                 onAddClick = {
                     navController.navigate("add_fuel/$vehicleId")
                 },
-                onEditClick = {
-                    navController.navigate("modify_fuel_entry/${it.id}")
+                onEditClick = { entry ->
+                    navController.navigate("${Routes.MODIFY_FUEL_SCREEN}/$vehicleId/${entry.id}")
                 }
             )
         }
 
-        composable("add_fuel/{vehicleId}", arguments = listOf(
-            navArgument("vehicleId") { type = NavType.StringType }
-        )) { backStackEntry ->
-            val vehicleId = backStackEntry.arguments?.getString("vehicleId") ?: return@composable
+
+        composable("add_fuel/{vehicleId}") { backStackEntry ->
+            val vehicleId = backStackEntry.arguments?.getString("vehicleId") ?: ""
             AddFuelScreen(
                 vehicleId = vehicleId,
                 onSave = { navController.popBackStack() },
                 onCancel = { navController.popBackStack() }
             )
         }
+
+
+        composable("$MODIFY_FUEL_SCREEN/{vehicleId}/{entryId}") { backStackEntry ->
+            val vehicleId = backStackEntry.arguments?.getString("vehicleId") ?: ""
+            val entryId = backStackEntry.arguments?.getString("entryId") ?: ""
+
+            ModifyFuelScreen(
+                vehicleId = vehicleId,
+                entryId = entryId,
+                onCancel = { navController.popBackStack() },
+                onSave = { navController.popBackStack() }
+            )
+        }
+
     }
 }
