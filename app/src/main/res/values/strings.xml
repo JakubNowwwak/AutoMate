@@ -40,4 +40,9 @@
     <string name="total_price">Total Price (€)</string>
     <string name="liters">Liters</string>
     <string name="note_optional">Note (optional)</string>
+    <string name="add_maintenance">Add Maintenance</string>
+    <string name="maintenance_overview">Maintenance Overview</string>
+    <string name="maintenance_type">Maintenance Type</string>
+    <string name="price">Price (€)</string>
+    <string name="maintenance_entry_not_found">Maintenance entry not found.</string>
 </resources>

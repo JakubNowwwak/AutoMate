@@ -115,7 +115,7 @@ fun VehicleDetailScreen(
                 .padding(horizontal = 16.dp, vertical = 16.dp)
         ) {
             Button(
-                onClick = { navController.navigate("${Routes.MODIFY_VEHICLE}/${vehicle.id}")},
+                onClick = { navController.navigate("${Routes.MODIFY_VEHICLE}/${vehicle.id}") },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 4.dp),
@@ -138,7 +138,9 @@ fun VehicleDetailScreen(
 
 
             Button(
-                onClick = { /*TODO*/ },
+                onClick = {
+                    navController.navigate("maintenance_overview/${vehicle.id}")
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 4.dp),
@@ -152,7 +154,7 @@ fun VehicleDetailScreen(
                 modifier = Modifier.fillMaxSize()
             ) {
                 Button(
-                    onClick = { showDialog = true},
+                    onClick = { showDialog = true },
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .fillMaxWidth()

@@ -44,4 +44,16 @@ class VehicleViewModel(application: Application) : AndroidViewModel(application)
             VehicleStorage.saveVehicles(getApplication(), current)
         }
     }
+
+    fun updateVehicleOdometerIfHigher(vehicleId: String, newOdometer: String) {
+        val vehicle = getVehicleById(vehicleId) ?: return
+        val current = vehicle.currentOdometer?.toFloatOrNull() ?: 0f
+        val incoming = newOdometer.toFloatOrNull() ?: 0f
+
+        if (incoming > current) {
+            val updated = vehicle.copy(currentOdometer = newOdometer)
+            updateVehicle(updated)
+        }
+    }
+
 }

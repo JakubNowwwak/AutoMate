@@ -11,6 +11,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.automate.fuel.ModifyFuelScreen
+import com.example.automate.maintenance.AddMaintenanceScreen
+import com.example.automate.maintenance.MaintenanceOverviewScreen
+import com.example.automate.maintenance.ModifyMaintenanceScreen
 import com.example.automate.navigation.Routes.MODIFY_FUEL_SCREEN
 import com.example.automate.vehicles.AddVehicleScreen
 import com.example.automate.vehicles.ModifyVehicleScreen
@@ -131,6 +134,47 @@ fun NavGraph(
                 entryId = entryId,
                 onCancel = { navController.popBackStack() },
                 onSave = { navController.popBackStack() }
+            )
+        }
+
+        composable("maintenance_overview/{vehicleId}") { backStackEntry ->
+            val vehicleId = backStackEntry.arguments?.getString("vehicleId") ?: ""
+            MaintenanceOverviewScreen(
+                vehicleId = vehicleId,
+                onBackClick = { navController.popBackStack() },
+                onAddClick = {
+                    navController.navigate("add_maintenance/$vehicleId")
+                },
+                onEditClick = { entry ->
+                    navController.navigate("modify_maintenance/${vehicleId}/${entry.id}")
+                }
+            )
+        }
+
+        composable("add_maintenance/{vehicleId}") { backStackEntry ->
+            val vehicleId = backStackEntry.arguments?.getString("vehicleId") ?: ""
+            AddMaintenanceScreen(
+                vehicleId = vehicleId,
+                onSave = { navController.popBackStack() },
+                onCancel = { navController.popBackStack() }
+            )
+        }
+
+        composable(
+            "modify_maintenance/{vehicleId}/{entryId}",
+            arguments = listOf(
+                navArgument("vehicleId") { type = NavType.StringType },
+                navArgument("entryId") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val vehicleId = backStackEntry.arguments?.getString("vehicleId") ?: ""
+            val entryId = backStackEntry.arguments?.getString("entryId") ?: ""
+
+            ModifyMaintenanceScreen(
+                vehicleId = vehicleId,
+                entryId = entryId,
+                onSave = { navController.popBackStack() },
+                onCancel = { navController.popBackStack() }
             )
         }
 
