@@ -17,12 +17,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Create
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -39,9 +37,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.example.automate.R
-import com.example.automate.model.Vehicle
 
-
+/**
+ * Main screen which shows a list of vehicles added by an user.
+ *
+ * @param vehicles List of vehicles.
+ * @param onAddVehicleClick Called, when user clicks on FAB.
+ * @param onVehicleClick Called, when user clicks on a vehicle from lazy column.
+ */
 @Composable
 fun VehiclesScreen(
     vehicles: List<Vehicle>,
@@ -50,6 +53,7 @@ fun VehiclesScreen(
 ) {
     Scaffold(
         floatingActionButton = {
+            // FAB for adding a new vehicle
             ExtendedFloatingActionButton(
                 text = { Text(stringResource(R.string.add_vehicle)) },
                 icon = { Icon(Icons.Filled.Create, contentDescription = null) },
@@ -65,30 +69,21 @@ fun VehiclesScreen(
                 .padding(padding)
                 .padding(16.dp)
         ) {
+            // Creates "AUTOMATE" title
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
 
             ) {
-                IconButton(
-                    onClick = { /* TODO: menu  */ },
-                    modifier = Modifier.align(Alignment.CenterStart)
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Menu,
-                        contentDescription = stringResource(R.string.hamburger_menu)
-                    )
-                }
-
                 Text(
                     text = buildAnnotatedString {
-                        append("AUTO")
+                        append(stringResource(R.string.auto))
                         addStyle(
                             style = SpanStyle(fontWeight = FontWeight.W900),
                             start = 0,
                             end = 4
                         )
-                        append("MATE")
+                        append(stringResource(R.string.mate))
                     },
                     style = MaterialTheme.typography.headlineLarge.copy(
                         fontSize = MaterialTheme.typography.displaySmall.fontSize
@@ -104,30 +99,37 @@ fun VehiclesScreen(
                 thickness = 2.dp
             )
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = stringResource(R.string.select_your_vehicle),
-                    style = MaterialTheme.typography.headlineMedium
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .padding(start = 6.dp)
-                        .size(28.dp)
-                )
+            // Text shows after users adds vehicles
+            if (vehicles.isNotEmpty()) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = stringResource(R.string.select_your_vehicle),
+                        style = MaterialTheme.typography.headlineMedium
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .padding(start = 6.dp)
+                            .size(28.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
             }
+
 
             Spacer(modifier = Modifier.height(4.dp))
 
+            // Lazy column which shows all vehicles
             LazyColumn {
                 items(vehicles) { vehicle ->
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 8.dp),
-                        onClick = {onVehicleClick(vehicle.id)}
+                        onClick = { onVehicleClick(vehicle.id) }
 
                     ) {
                         Box(
@@ -136,6 +138,7 @@ fun VehiclesScreen(
                                 .height(200.dp)
                         )
                         {
+                            // Image of a vehicle
                             if (!vehicle.image.isNullOrBlank()) {
                                 Image(
                                     painter = rememberAsyncImagePainter(vehicle.image),
@@ -145,6 +148,7 @@ fun VehiclesScreen(
                                 )
                             }
 
+                            // Gradient
                             Box(
                                 modifier = Modifier
                                     .fillMaxSize()
@@ -159,6 +163,7 @@ fun VehiclesScreen(
                                     )
                             )
 
+                            // Vehicle info
                             Column(
                                 modifier = Modifier
                                     .align(Alignment.BottomStart)

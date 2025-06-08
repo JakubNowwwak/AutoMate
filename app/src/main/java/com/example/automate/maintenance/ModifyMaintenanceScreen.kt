@@ -10,7 +10,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
@@ -41,6 +43,15 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
+/**
+ * Screen that allows user to modify an existing maintenance entry.
+ *
+ * @param vehicleId ID of a vehicle to which the maintenance entry belongs.
+ * @param entryId ID of the maintenance entry to be modified.
+ * @param onSave Called when user clicks on save FAB.
+ * @param onCancel Called when user clicks on cancel FAB.
+ * @param viewModel VehicleViewModel used for data management.
+ */
 @Composable
 fun ModifyMaintenanceScreen(
     vehicleId: String,
@@ -58,7 +69,7 @@ fun ModifyMaintenanceScreen(
     }
 
     val calendar = Calendar.getInstance()
-    val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+    val dateFormat = SimpleDateFormat(stringResource(R.string.dd_mm_yyyy), Locale.getDefault())
 
     var maintenanceType by rememberSaveable { mutableStateOf(existingEntry.type) }
     var price by rememberSaveable { mutableStateOf(existingEntry.price) }
@@ -107,13 +118,17 @@ fun ModifyMaintenanceScreen(
                 .fillMaxWidth()
                 .padding(padding)
                 .padding(16.dp)
+                .verticalScroll(rememberScrollState())
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = onCancel) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
+                    Icon(
+                        Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.back)
+                    )
                 }
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Modify Maintenance", style = MaterialTheme.typography.headlineMedium)
+                Text(text = stringResource(R.string.modify_maintenance), style = MaterialTheme.typography.headlineMedium)
             }
 
             Spacer(modifier = Modifier.height(16.dp))

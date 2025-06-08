@@ -9,7 +9,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
@@ -43,6 +45,15 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
+/**
+ * Screen which allows user to modify fuel entry.
+ *
+ * @param vehicleId ID of a vehicle to modify fuel entry for.
+ * @param entryId IF of a specific fuel entry to modify.
+ * @param onSave Called when user clicks on save FAB.
+ * @param onCancel Called when user clicks on cancel icon.
+ * @param viewModel VehicleViewModel used for data management.
+ */
 @Composable
 fun ModifyFuelScreen(
     vehicleId: String,
@@ -51,13 +62,8 @@ fun ModifyFuelScreen(
     onCancel: () -> Unit,
     viewModel: VehicleViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
-    println("ModifyFuelScreen: entryId = $entryId")
-    println("ModifyFuelScreen: vehicleId = $vehicleId")
-
-
     val context = LocalContext.current
     val entry = remember(entryId) { FuelStorage.getEntryById(context, entryId) }
-    println("Loaded entry: $entry")
 
     val vehicle = viewModel.getVehicleById(vehicleId)
 
@@ -67,6 +73,7 @@ fun ModifyFuelScreen(
     var note by rememberSaveable { mutableStateOf("") }
     var date by rememberSaveable { mutableStateOf("") }
 
+    // Sets initial values of fields from entry
     LaunchedEffect(entry) {
         entry?.let {
             liters = it.liters
@@ -78,7 +85,7 @@ fun ModifyFuelScreen(
     }
 
     val calendar = Calendar.getInstance()
-    val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+    val dateFormat = SimpleDateFormat(stringResource(R.string.dd_mm_yyyy), Locale.getDefault())
 
     var showOdometerError by remember { mutableStateOf(false) }
 
@@ -94,21 +101,18 @@ fun ModifyFuelScreen(
     )
 
     val isInputValid = liters.toFloatOrNull()?.let { it > 0 } == true &&
-            price.toFloatOrNull()?.let { it > 0 } == true &&
-            odometer.toFloatOrNull()?.let { odo ->
-                odo > 0 && odo > (vehicle?.currentOdometer?.toFloatOrNull() ?: 0f)
-            } == true
+            price.toFloatOrNull()?.let { it > 0 } == true
 
     if (showOdometerError) {
         AlertDialog(
             onDismissRequest = { showOdometerError = false },
             confirmButton = {
                 TextButton(onClick = { showOdometerError = false }) {
-                    Text("OK")
+                    Text(stringResource(R.string.ok))
                 }
             },
-            title = { Text("Invalid odometer") },
-            text = { Text("New odometer value must be greater than the previous one.") }
+            title = { Text(stringResource(R.string.invalid_odometer)) },
+            text = { Text(stringResource(R.string.new_odometer_value)) }
         )
     }
 
@@ -139,7 +143,7 @@ fun ModifyFuelScreen(
                 containerColor = if (isInputValid) MaterialTheme.colorScheme.primary else Color.LightGray,
                 contentColor = Color.White
             ) {
-                Icon(Icons.Default.Check, contentDescription = "Save")
+                Icon(Icons.Default.Check, contentDescription = stringResource(R.string.save))
             }
         }
     ) { padding ->
@@ -147,13 +151,15 @@ fun ModifyFuelScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 40.dp)
+                .verticalScroll(rememberScrollState())
         ) {
+            // Top of the screen with title and back icon
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = onCancel) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                 }
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Modify Fuel Entry", style = MaterialTheme.typography.headlineMedium)
+                Text(text = stringResource(R.string.modify_fuel_entry), style = MaterialTheme.typography.headlineMedium)
             }
 
             Column(
@@ -169,7 +175,7 @@ fun ModifyFuelScreen(
                     OutlinedTextField(
                         value = date,
                         onValueChange = {},
-                        label = { Text("Date") },
+                        label = { Text(stringResource(R.string.save)) },
                         readOnly = true,
                         enabled = false,
                         modifier = Modifier.fillMaxWidth(),
@@ -186,7 +192,7 @@ fun ModifyFuelScreen(
                 OutlinedTextField(
                     value = odometer,
                     onValueChange = { if (it.all { ch -> ch.isDigit() || ch == '.' }) odometer = it },
-                    label = { Text("Odometer (km)") },
+                    label = { Text(stringResource(R.string.odometer_km)) },
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
                 )
@@ -194,7 +200,7 @@ fun ModifyFuelScreen(
                 OutlinedTextField(
                     value = price,
                     onValueChange = { if (it.all { ch -> ch.isDigit() || ch == '.' }) price = it },
-                    label = { Text("Total Price (€)") },
+                    label = { Text(stringResource(R.string.total_price)) },
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
                 )
@@ -202,7 +208,7 @@ fun ModifyFuelScreen(
                 OutlinedTextField(
                     value = liters,
                     onValueChange = { if (it.all { ch -> ch.isDigit() || ch == '.' }) liters = it },
-                    label = { Text("Liters") },
+                    label = { Text(stringResource(R.string.liters)) },
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
                 )
@@ -210,7 +216,7 @@ fun ModifyFuelScreen(
                 OutlinedTextField(
                     value = note,
                     onValueChange = { note = it },
-                    label = { Text("Note (optional)") },
+                    label = { Text(stringResource(R.string.note_optional)) },
                     modifier = Modifier.fillMaxWidth()
                 )
             }

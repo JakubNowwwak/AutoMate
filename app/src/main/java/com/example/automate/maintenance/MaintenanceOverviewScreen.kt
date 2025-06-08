@@ -34,6 +34,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.automate.R
 
+/**
+ * Overview screen for maintenance entries of a specific vehicle.
+ *
+ * @param vehicleId Vehicle ID to load maintenance entries for.
+ * @param onBackClick Called when user clicks on back icon.
+ * @param onAddClick Called when user clicks on add FAB.
+ * @param onEditClick Called when user clicks specific maintenance entry.
+ */
 @Composable
 fun MaintenanceOverviewScreen(
     vehicleId: String,
@@ -80,6 +88,13 @@ fun MaintenanceOverviewScreen(
     }
 }
 
+/**
+ * Card for a single maintenance entry.
+ *
+ * @param entry Maintenance entry to display.
+ * @param modifier Modifier for layout customizations.
+ * @param onClick Called when user clicks on the card.
+ */
 @Composable
 fun MaintenanceEntryCard(
     entry: MaintenanceEntry,
@@ -105,13 +120,9 @@ fun MaintenanceEntryCard(
                     fontWeight = FontWeight.Bold
                 )
                 if(entry.odometer.isNotBlank()) {
-                    Text(
-                        text = "${entry.odometer} km",
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
+                    Text(entry.odometer + stringResource(R.string.empty_space) + stringResource(R.string.km))
 
+                }
 
             }
             Spacer(modifier = Modifier.height(8.dp))
@@ -127,7 +138,7 @@ fun MaintenanceEntryCard(
                 )
                 if(entry.price.isNotBlank()) {
                     Text(
-                        text = "${entry.price}€",
+                        text = stringResource(R.string.Euro, entry.price),
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color.Gray
                     )

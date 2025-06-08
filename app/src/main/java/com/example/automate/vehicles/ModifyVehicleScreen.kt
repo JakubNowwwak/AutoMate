@@ -12,7 +12,9 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Close
@@ -31,12 +33,17 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.example.automate.R
-import com.example.automate.model.Vehicle
-import java.io.File
-import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.core.net.toUri
 
+/**
+ * Screen for modifying vehicles with pre filled data.
+ *
+ * @param vehicleToEdit Vehicle which data can be updated.
+ * @param onSaveClick Called when user clicks on save button.
+ * @param onCancelClick Called when user clicks on cancel icon.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ModifyVehicleScreen(
@@ -44,23 +51,26 @@ fun ModifyVehicleScreen(
     onSaveClick: (Vehicle) -> Unit,
     onCancelClick: () -> Unit
 ) {
+    // Saver for handling text values
     val textFieldValueSaver = listSaver<TextFieldValue, Any>(
         save = { listOf(it.text) },
         restore = { TextFieldValue(it[0] as String) }
     )
 
+    // Variables which hold values form user input
     var brand by rememberSaveable(stateSaver = textFieldValueSaver) { mutableStateOf(TextFieldValue(vehicleToEdit.brand)) }
     var model by rememberSaveable(stateSaver = textFieldValueSaver) { mutableStateOf(TextFieldValue(vehicleToEdit.model)) }
     var plate by rememberSaveable(stateSaver = textFieldValueSaver) { mutableStateOf(TextFieldValue(vehicleToEdit.plate)) }
     var vin by rememberSaveable(stateSaver = textFieldValueSaver) { mutableStateOf(TextFieldValue(vehicleToEdit.vin ?: "")) }
     var currentOdometer by rememberSaveable(stateSaver = textFieldValueSaver) { mutableStateOf(TextFieldValue(vehicleToEdit.currentOdometer ?: "")) }
-    var selectedUnit by rememberSaveable { mutableStateOf(vehicleToEdit.unit ?: "km") }
+    val km = stringResource(R.string.km)
+    var selectedUnit by rememberSaveable { mutableStateOf(vehicleToEdit.unit ?: km) }
     var selectedAgeDate by rememberSaveable { mutableStateOf(vehicleToEdit.registrationDate) }
-    var vehicleImage by rememberSaveable { mutableStateOf(vehicleToEdit.image?.let { Uri.parse(it) }) }
+    var vehicleImage by rememberSaveable { mutableStateOf(vehicleToEdit.image?.toUri()) }
 
     val context = LocalContext.current
     val calendar = Calendar.getInstance()
-    val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+    val dateFormat = SimpleDateFormat(stringResource(R.string.dd_mm_yyyy), Locale.getDefault())
 
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -82,11 +92,14 @@ fun ModifyVehicleScreen(
     val enableOptional =
         brand.text.isNotBlank() || model.text.isNotBlank() || plate.text.isNotBlank()
 
+    // Layout
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
+            .verticalScroll(rememberScrollState())
     ) {
+        // Top of the screen with cancel and save buttons
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -103,13 +116,18 @@ fun ModifyVehicleScreen(
                 }
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Edit Vehicle",
+                    text = stringResource(R.string.edit_vehicle),
                     style = MaterialTheme.typography.headlineMedium
                 )
             }
+
+            // Save button which updates the vehicle with the new data
             Button(
                 onClick = {
-                    val imagePath = if (vehicleImage != null && vehicleImage.toString().startsWith("content://")) {
+                    val imagePath = if (vehicleImage != null && vehicleImage.toString().startsWith(
+                            context.getString(
+                                R.string.content
+                            ))) {
                         val bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                             val source = ImageDecoder.createSource(context.contentResolver, vehicleImage!!)
                             ImageDecoder.decodeBitmap(source)
@@ -141,6 +159,7 @@ fun ModifyVehicleScreen(
             }
         }
 
+        // Image picker
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -223,6 +242,7 @@ fun ModifyVehicleScreen(
             val unitOptions = listOf(stringResource(R.string.km), stringResource(R.string.mi))
             var expandedUnit by remember { mutableStateOf(false) }
 
+            // Choosing km or mi
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -240,7 +260,9 @@ fun ModifyVehicleScreen(
                         enabled = enableOptional,
                         label = { Text(stringResource(R.string.unit)) },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedUnit) },
-                        modifier = Modifier.width(100.dp).menuAnchor()
+                        modifier = Modifier
+                            .width(100.dp)
+                            .menuAnchor()
                     )
 
                     ExposedDropdownMenu(
@@ -270,6 +292,7 @@ fun ModifyVehicleScreen(
                 )
             }
 
+            // Date picker
             Button(
                 onClick = { datePickerDialog.show() },
                 enabled = enableOptional

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">AUTOmate</string>
+    <string name="app_name">AutoMate</string>
     <string name="add_vehicle">Add Vehicle</string>
     <string name="select_your_vehicle">Select your vehicle</string>
     <string name="hamburger_menu">Hamburger menu</string>
@@ -45,4 +45,31 @@
     <string name="maintenance_type">Maintenance Type</string>
     <string name="price">Price (€)</string>
     <string name="maintenance_entry_not_found">Maintenance entry not found.</string>
+    <string name="confirmation">Confirmation</string>
+    <string name="are_you_sure_you_want_to_delete_the_vehicle">Are you sure you want to delete the vehicle?</string>
+    <string name="history">History</string>
+    <string name="add_entry">Add Entry</string>
+    <string name="overall">Overall</string>
+    <string name="avg_fuel_consumption">Avg. fuel consumption</string>
+    <string name="avg_fuel_price">Avg. fuel price</string>
+    <string name="avg_expenditure">Avg. expenditure</string>
+    <string name="avg_volume">Avg. volume</string>
+    <string name="_1f_l_100km">%.1f L/100km</string>
+    <string name="_3f_l">%.3f €/L</string>
+    <string name="_0f">%.0f €</string>
+    <string name="_2f_l">%.2f L</string>
+    <string name="E">%1$s €</string>
+    <string name="L">%1$s L</string>
+    <string name="new_odometer_value">New odometer value must be greater than the previous one.</string>
+    <string name="modify_fuel_entry">Modify Fuel Entry</string>
+    <string name="dd_mm_yyyy">dd.MM.yyyy</string>
+    <string name="Euro">%1$s€</string>
+    <string name="modify_maintenance">Modify Maintenance</string>
+    <string name="edit_vehicle">Edit Vehicle</string>
+    <string name="content">content://</string>
+    <string name="yes">Yes</string>
+    <string name="auto">AUTO</string>
+    <string name="mate">MATE</string>
+    <string name="plus">+</string>
+    <string name="empty_space">" "</string>
 </resources>

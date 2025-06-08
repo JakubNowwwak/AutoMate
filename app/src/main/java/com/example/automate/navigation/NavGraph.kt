@@ -21,6 +21,9 @@ import com.example.automate.vehicles.VehicleDetailScreen
 import com.example.automate.vehicles.VehiclesScreen
 import com.example.automate.viewModel.VehicleViewModel
 
+/**
+ * Object containing routes for navigation.
+ */
 object Routes {
     const val VEHICLES = "vehicles"
     const val ADD_VEHICLE = "add_vehicle"
@@ -29,6 +32,12 @@ object Routes {
     const val MODIFY_FUEL_SCREEN = "modify_fuel"
 }
 
+/**
+ * Function that defines the navigation graph for the app.
+ *
+ * @param navController Controller responsible for navigating between destinations.
+ * @param vehicleViewModel ViewModel for access and managing vehicle data.
+ */
 @Composable
 fun NavGraph(
     navController: NavHostController,
@@ -49,6 +58,7 @@ fun NavGraph(
 
             )
         }
+
         composable(Routes.ADD_VEHICLE) {
             AddVehicleScreen(
                 onSaveClick = { vehicle ->
@@ -68,16 +78,12 @@ fun NavGraph(
                 VehicleDetailScreen(
                     vehicle = vehicle,
                     onBackClick = { navController.popBackStack() },
-                    onEditClick = {
-                        navController.navigate("modify_vehicle/${vehicle.id}")
-                    },
                     onDeleteClick = {
                         vehicleViewModel.removeVehicle(vehicle.id)
                         navController.popBackStack()
                     },
                     navController = navController
                 )
-
             }
         }
 

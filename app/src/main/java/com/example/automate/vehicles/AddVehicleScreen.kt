@@ -45,42 +45,49 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import coil.compose.rememberAsyncImagePainter
 import com.example.automate.R
-import com.example.automate.model.Vehicle
 import java.io.File
 import java.io.FileOutputStream
 import java.util.UUID
 
-
+/**
+ * Screen for adding new vehicles.
+ *
+ * @param onSaveClick Called when user clicks on save button.
+ * @param onCancelClick Called when user clicks on cancel icon.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddVehicleScreen(
     onSaveClick: (Vehicle) -> Unit,
     onCancelClick: () -> Unit
 ) {
-    var brand by remember { mutableStateOf(TextFieldValue("")) }
-    var model by remember { mutableStateOf(TextFieldValue("")) }
-    var plate by remember { mutableStateOf(TextFieldValue("")) }
-
-    var vin by remember { mutableStateOf(TextFieldValue("")) }
-    var milage by remember { mutableStateOf(TextFieldValue("")) }
+    var brand by rememberSaveable { mutableStateOf(("")) }
+    var model by rememberSaveable { mutableStateOf(("")) }
+    var plate by rememberSaveable { mutableStateOf(("")) }
+    var vin by rememberSaveable { mutableStateOf(("")) }
+    var milage by rememberSaveable { mutableStateOf(("")) }
 
     val context = LocalContext.current
     val calendar = Calendar.getInstance()
-    val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+    val dateFormat = SimpleDateFormat(stringResource(R.string.dd_mm_yyyy), Locale.getDefault())
     var selectedAgeDate by remember { mutableStateOf<String?>(null) }
 
     var vehicleImage by remember { mutableStateOf<Uri?>(null) }
@@ -103,15 +110,16 @@ fun AddVehicleScreen(
     )
 
     val enableOptional =
-        brand.text.isNotBlank() || model.text.isNotBlank() || plate.text.isNotBlank()
+        brand.isNotBlank() || model.isNotBlank() || plate.isNotBlank()
 
-
+    // Layout
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
+            .verticalScroll(rememberScrollState())
     ) {
-
+        // Top of the screen with cancel and save buttons
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -137,10 +145,11 @@ fun AddVehicleScreen(
                 )
             }
 
-            val context = LocalContext.current
             val unitOptions = listOf(stringResource(R.string.km), stringResource(R.string.mi))
-            var selectedUnit by remember { mutableStateOf("km") }
+            val km = stringResource(R.string.km)
+            val selectedUnit by remember { mutableStateOf(km) }
 
+            // Save button
             Button(
                 onClick = {
                     val imagePath = vehicleImage?.let { uri ->
@@ -157,11 +166,11 @@ fun AddVehicleScreen(
 
 
                     val vehicle = Vehicle(
-                        brand = brand.text,
-                        model = model.text,
-                        plate = plate.text,
-                        vin = vin.text,
-                        currentOdometer = milage.text,
+                        brand = brand,
+                        model = model,
+                        plate = plate,
+                        vin = vin,
+                        currentOdometer = milage,
                         unit = selectedUnit,
                         registrationDate = selectedAgeDate,
                         image = imagePath
@@ -175,6 +184,7 @@ fun AddVehicleScreen(
             }
         }
 
+        // Image picker
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -257,7 +267,8 @@ fun AddVehicleScreen(
             }
 
             val unitOptions = listOf(stringResource(R.string.km), stringResource(R.string.mi))
-            var selectedUnit by remember { mutableStateOf("km") }
+            val km = stringResource(R.string.km)
+            var selectedUnit by remember { mutableStateOf(km) }
             var expandedUnit by remember { mutableStateOf(false) }
 
             Row(
@@ -302,11 +313,17 @@ fun AddVehicleScreen(
 
                 OutlinedTextField(
                     value = milage,
-                    onValueChange = { milage = it },
+                    onValueChange = { input ->
+                        if (input.all { it.isDigit() }) {
+                            milage = input
+                        }
+                    },
                     label = { Text(stringResource(R.string.mileage)) },
                     enabled = enableOptional,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
                 )
+
             }
 
             Column(
@@ -340,6 +357,14 @@ fun AddVehicleScreen(
     }
 }
 
+/**
+ * Saves image to internal storage.
+ *
+ * @param context Android context for saving into internal storage
+ * @param bitmap Image to be saved.
+ * @param filename Filename where image will be stored.
+ * @return Path to internal storage.
+ */
 fun saveImageToInternalStorage(context: Context, bitmap: Bitmap, filename: String): String {
     val file = File(context.filesDir, filename)
     FileOutputStream(file).use { out ->

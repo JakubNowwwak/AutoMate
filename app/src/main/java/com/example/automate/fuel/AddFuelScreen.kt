@@ -7,7 +7,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
@@ -42,6 +44,14 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
+/**
+ * Screen for adding a new fuel entry for a specific vehicle.
+ *
+ * @param vehicleId ID a vehicle to add fuel entry for.
+ * @param onSave Called when user clicks on save FAB.
+ * @param onCancel Called when user clicks on cancel icon.
+ * @param viewModel VehicleViewModel used for data management.
+ */
 @Composable
 fun AddFuelScreen(
     vehicleId: String,
@@ -75,13 +85,14 @@ fun AddFuelScreen(
         calendar.get(Calendar.DAY_OF_MONTH)
     )
 
-
+    // Input validation - odometer value is greater than previous
     val isInputValid = liters.toFloatOrNull()?.let { it > 0 } == true &&
             price.toFloatOrNull()?.let { it > 0 } == true &&
             odometer.toFloatOrNull()?.let { odo ->
                 odo > 0 && odo > (vehicle?.currentOdometer?.toFloatOrNull() ?: 0f)
             } == true
 
+    // Error for invalid odometer value
     if (showOdometerError) {
         AlertDialog(
             onDismissRequest = { showOdometerError = false },
@@ -95,6 +106,7 @@ fun AddFuelScreen(
         )
     }
 
+    // Layout
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
@@ -110,6 +122,7 @@ fun AddFuelScreen(
                         )
                         FuelStorage.addEntry(context, entry)
 
+                        // Update odometer of vehicle
                         if (vehicle != null) {
                             val updatedVehicle = vehicle.copy(currentOdometer = odometer)
                             viewModel.updateVehicle(updatedVehicle)
@@ -131,7 +144,9 @@ fun AddFuelScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 40.dp)
+                .verticalScroll(rememberScrollState())
         ) {
+            // Top of the screen with title and back icon
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = onCancel) {
                     Icon(
@@ -151,6 +166,7 @@ fun AddFuelScreen(
                     .padding(padding)
                     .padding(16.dp)
             ) {
+                // Date field
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()

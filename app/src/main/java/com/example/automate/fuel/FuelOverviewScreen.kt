@@ -38,7 +38,17 @@ import com.example.automate.fuel.FuelStorage
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.height
+import java.text.SimpleDateFormat
+import java.util.Locale
 
+/**
+ * Screen that show fuel entries for a specific vehicle, also shows overall fuel statistics.
+ *
+ * @param vehicleId ID of a vehicle to show fuel entries for.
+ * @param onBackClick Called when user clicks on back icon.
+ * @param onAddClick Called when user clicks on add FAB.
+ * @param onEditClick Called when user clicks on specific fuel entry card.
+ */
 @Composable
 fun FuelOverviewScreen(
     vehicleId: String,
@@ -49,7 +59,18 @@ fun FuelOverviewScreen(
     val context = LocalContext.current
     val entries = remember { FuelStorage.getEntriesForVehicle(context, vehicleId) }
 
-    val sortedEntries = entries.sortedByDescending { it.date }
+
+    val dateFormat = remember { SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()) }
+
+    val sortedEntries = remember(entries) {
+        entries.sortedByDescending { entry ->
+            try {
+                dateFormat.parse(entry.date)?.time ?: 0L
+            } catch (e: Exception) {
+                0L
+            }
+        }
+    }
 
     val enrichedEntries = sortedEntries.mapIndexed { index, entry ->
         val currentOdo = entry.odometer?.toFloatOrNull() ?: 0f
@@ -64,10 +85,11 @@ fun FuelOverviewScreen(
         Triple(entry, kmDiff, pricePerLiter)
     }
 
+    // Layout
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(onClick = onAddClick) {
-                Icon(Icons.Default.Add, contentDescription = "Add Entry")
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_entry))
             }
         }
     ) { padding ->
@@ -76,6 +98,7 @@ fun FuelOverviewScreen(
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 40.dp)
         ) {
+            // Top of the screen with title and back icon
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -89,7 +112,7 @@ fun FuelOverviewScreen(
                 Spacer(modifier = Modifier.width(8.dp))
 
                 Text(
-                    text = "Fuel Overview",
+                    text = stringResource(R.string.fuel_overview),
                     style = MaterialTheme.typography.headlineMedium
                 )
             }
@@ -98,21 +121,25 @@ fun FuelOverviewScreen(
             LazyColumn(modifier = Modifier.padding(padding)) {
                 item{
                     FuelOverallCard(entries = entries)
-                    HorizontalDivider(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 8.dp)
-                            .padding(horizontal = 16.dp),
-                        thickness = 2.dp
-                    )
-                    Text(
-                        text = "History",
-                        style = MaterialTheme.typography.labelLarge,
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp)
-                            .padding(bottom = 8.dp),
-                        color = Color.Gray
-                    )
+
+                    // Dividing line if there are entries
+                    if (entries.isNotEmpty()) {
+                        HorizontalDivider(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 8.dp)
+                                .padding(horizontal = 16.dp),
+                            thickness = 2.dp
+                        )
+                        Text(
+                            text = stringResource(R.string.history),
+                            style = MaterialTheme.typography.labelLarge,
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .padding(bottom = 8.dp),
+                            color = Color.Gray
+                        )
+                    }
                 }
 
 
@@ -131,6 +158,12 @@ fun FuelOverviewScreen(
     }
 }
 
+/**
+ * Shows overall fuel metrics for a specific vehicle.
+ *
+ * @param entries List of all fuel entries.
+ * @param modifier Modifier for layout customizations.
+ */
 @SuppressLint("DefaultLocale")
 @Composable
 fun FuelOverallCard(entries: List<FuelEntry>, modifier: Modifier = Modifier) {
@@ -162,23 +195,36 @@ fun FuelOverallCard(entries: List<FuelEntry>, modifier: Modifier = Modifier) {
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = "Overall",
+                text = stringResource(R.string.overall),
                 style = MaterialTheme.typography.labelLarge,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
 
-            RowItem(R.drawable.fuel_pump_icon, "Avg. fuel consumption", String.format("%.1f L/100km", avgConsumption))
-            RowItem(R.drawable.fuel_price_icon, "Avg. fuel price", String.format("%.3f €/L", avgPricePerLiter))
-            RowItem(R.drawable.money_icon, "Avg. expenditure", String.format("%.0f €", avgExpenditure))
-            RowItem(R.drawable.fuel_drop_icon, "Avg. volume", String.format("%.2f L", avgVolume))
+            RowItem(R.drawable.fuel_pump_icon,
+                stringResource(R.string.avg_fuel_consumption), String.format(stringResource(R.string._1f_l_100km), avgConsumption))
+            RowItem(R.drawable.fuel_price_icon,
+                stringResource(R.string.avg_fuel_price), String.format(stringResource(R.string._3f_l), avgPricePerLiter))
+            RowItem(R.drawable.money_icon,
+                stringResource(R.string.avg_expenditure), String.format(stringResource(R.string._0f), avgExpenditure))
+            RowItem(R.drawable.fuel_drop_icon,
+                stringResource(R.string.avg_volume), String.format(stringResource(R.string._2f_l), avgVolume))
         }
     }
 }
 
+/**
+ * Reusable row item used inside of the FuelOverallCard for stats.
+ *
+ * @param iconRes Resource ID of a icon.
+ * @param label Descriptive label for a value.
+ * @param value String representation a the calculated value.
+ */
 @Composable
 fun RowItem(iconRes: Int, label: String, value: String) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -196,7 +242,14 @@ fun RowItem(iconRes: Int, label: String, value: String) {
     }
 }
 
-
+/**
+ * A card displaying a single fuel entry.
+ *
+ * @param entry Instance of a fuel entry.
+ * @param kmDiff Difference between current and previous odometer reading.
+ * @param pricePerLiter Price of fuel per liter calculated from volume and price.
+ * @param modifier Modifier for layout customizations.
+ */
 @SuppressLint("DefaultLocale")
 @Composable
 fun FuelEntryCard(
@@ -205,10 +258,14 @@ fun FuelEntryCard(
     pricePerLiter: Float,
     modifier: Modifier = Modifier
 ) {
-    val consumption = try {
-        val liters = entry.liters.toFloat()
-        if (kmDiff > 0) "%.1f L/100km".format((liters / kmDiff) * 100) else ""
-    } catch (e: Exception) {
+    val liters = entry.liters.toFloatOrNull()
+
+    val consumption = if (liters != null && kmDiff > 0f) {
+        stringResource(
+            R.string._1f_l_100km,
+            (liters / kmDiff) * 100f
+        )
+    } else {
         ""
     }
 
@@ -247,11 +304,12 @@ fun FuelEntryCard(
                 Column(horizontalAlignment = Alignment.End) {
                     entry.odometer?.let {
                         if (it.isNotBlank()) {
-                            Text(text = "$it km", style = MaterialTheme.typography.bodyMedium)
+                            Text(text = it + stringResource(R.string.km), style = MaterialTheme.typography.bodyMedium)
                         }
                     }
                     Text(
-                        text = "+$kmDiff km",
+                        //text = "+$kmDiff km",
+                        text = stringResource(R.string.plus) + kmDiff + stringResource(R.string.km),
                         style = MaterialTheme.typography.bodySmall,
                         color = Color.Gray
                     )
@@ -272,7 +330,7 @@ fun FuelEntryCard(
                         modifier = Modifier.size(24.dp),
                         contentScale = ContentScale.Fit
                     )
-                    Text(text = "${entry.price} €")
+                    Text(text = stringResource(R.string.E, entry.price))
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Image(
@@ -281,7 +339,7 @@ fun FuelEntryCard(
                         modifier = Modifier.size(24.dp),
                         contentScale = ContentScale.Fit
                     )
-                    Text(text = String.format("%.2f €/L", pricePerLiter))
+                    Text(text = String.format(stringResource(R.string._2f_l), pricePerLiter))
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Image(
@@ -290,7 +348,7 @@ fun FuelEntryCard(
                         modifier = Modifier.size(24.dp),
                         contentScale = ContentScale.Fit
                     )
-                    Text(text = "${entry.liters} L")
+                    Text(text = stringResource(R.string.L, entry.liters))
                 }
             }
 
